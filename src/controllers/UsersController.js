@@ -1,76 +1,76 @@
-const { hash, compare } = require("bcryptjs")
+const { hash, compare } = require("bcryptjs");
 
-const AppError = require("../utils/AppError")
-const sqliteConnections = require('../database/sqlite');
+const AppError = require("../utils/AppError");
+const sqliteConnections = require("../database/sqlite");
 const sqliteConnection = require("../database/sqlite");
-const { use } = require("express/lib/router");
+// const { use } = require("express/lib/router");
 
 class UsersController {
-    async create (request, response){
-        const { name, email, password } = request.body;
+	async create (request, response){
+		const { name, email, password } = request.body;
 
-        const database = await sqliteConnections();
-        const checkUsersExists = await database
-        .get("SELECT * FROM users WHERE email = (?)", [email]);
+		const database = await sqliteConnections();
+		const checkUsersExists = await database
+			.get("SELECT * FROM users WHERE email = (?)", [email]);
 
-        if(checkUsersExists){
-            throw new AppError ("Este email já está em uso.")
-        };
+		if(checkUsersExists){
+			throw new AppError ("Este email já está em uso.");
+		}
 
-        const hashPassword = await hash(password,8);
+		const hashPassword = await hash(password,8);
 
-        await database.run("INSERT INTO users (name, email, password) VALUES(?, ?, ?)",
-        [name, email, hashPassword]
-        )
+		await database.run("INSERT INTO users (name, email, password) VALUES(?, ?, ?)",
+			[name, email, hashPassword]
+		);
 
-        return response.status(201).json();
-    }
+		return response.status(201).json();
+	}
 
-    async update (request, response){
-        const { name, email, password, old_password } = request.body;
-        const { id } = request.params;
+	async update (request, response){
+		const { name, email, password, old_password } = request.body;
+		const { id } = request.params;
 
-        const database = await sqliteConnection();
-        const user = await database.get("SELECT * FROM users WHERE id = (?)", [id]);
+		const database = await sqliteConnection();
+		const user = await database.get("SELECT * FROM users WHERE id = (?)", [id]);
 
-        if(!user){
-            throw new AppError("Usuário nào encontrado");
-        }
+		if(!user){
+			throw new AppError("Usuário nào encontrado");
+		}
 
-        const userWithUpdateEmail = await database.get("SELECT * FROM users WHERE email = (?)", [email]);
+		const userWithUpdateEmail = await database.get("SELECT * FROM users WHERE email = (?)", [email]);
 
-        if(userWithUpdateEmail && userWithUpdateEmail.id !== user.id){
-        throw new AppError('Este email já está em uso.');
-        }
-        user.name = name ?? user.name; // Nullish coalescing operator (??)
-        user.email = email ?? user.email;
+		if(userWithUpdateEmail && userWithUpdateEmail.id !== user.id){
+			throw new AppError("Este email já está em uso.");
+		}
+		user.name = name ?? user.name; // Nullish coalescing operator (??)
+		user.email = email ?? user.email;
 
-        if(password && !old_password){
-            throw new AppError("Informe a senha antiga para atualizar")
-        }
-        if(password && old_password){
-            const checkOldPassword = await compare(old_password, user.password);
+		if(password && !old_password){
+			throw new AppError("Informe a senha antiga para atualizar");
+		}
+		if(password && old_password){
+			const checkOldPassword = await compare(old_password, user.password);
 
-            if(!checkOldPassword){
-                throw new AppError("A senha antiga não confere.");
-            }
+			if(!checkOldPassword){
+				throw new AppError("A senha antiga não confere.");
+			}
 
-            user.password = await hash(password, 8)
-        }
+			user.password = await hash(password, 8);
+		}
 
-        await database.run(`
+		await database.run(`
             UPDATE users SET
             name = ?, 
             email = ?,
             password = ?,
             update_at = DATETIME('now')
             WHERE id = ?`,
-            [user.name, user.email, user.password, id]
-        );
+		[user.name, user.email, user.password, id]
+		);
 
-        return response.status(200).json();
-    }
+		return response.status(200).json();
+	}
 
 }
 
-module.exports = UsersController
+module.exports = UsersController;

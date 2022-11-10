@@ -8,5 +8,5 @@ const createUsers = `
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     update_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )
-`
-module.exports = createUsers
+`;
+module.exports = createUsers;
