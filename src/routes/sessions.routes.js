@@ -5,7 +5,7 @@ const sessionsController = new SessionsController(); // Instanciando a função
 
 const sessionsRouter = Router();
 
-sessionsRouter.post("/", sessionsController.create );
+sessionsRouter.post("/", sessionsController.create);
 
 
 module.exports = sessionsRouter;
