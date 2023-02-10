@@ -5,11 +5,14 @@ const express = require("express");
 const app = express();
 const PORT = 3333;
 const routes = require("./routes");
+const uploadConfig = require("./configs/upload");
 const migrationsRun = require("./database/sqlite/migrations");
 
 app.use(express.json());
 app.use(routes);
 migrationsRun();
+
+app.use("/files", express.static(uploadConfig.UPLOAD_FOLDER));
 
 app.use((error, request, response, next) => {
 	if (error instanceof AppError) {
