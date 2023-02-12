@@ -7,7 +7,9 @@ const PORT = 3333;
 const routes = require("./routes");
 const uploadConfig = require("./configs/upload");
 const migrationsRun = require("./database/sqlite/migrations");
+const cors = require("cors");
 
+app.use(cors());
 app.use(express.json());
 app.use(routes);
 migrationsRun();
