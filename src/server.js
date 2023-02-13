@@ -16,6 +16,7 @@ migrationsRun();
 
 app.use("/files", express.static(uploadConfig.UPLOAD_FOLDER));
 
+// eslint-disable-next-line no-unused-vars
 app.use((error, request, response, next) => {
 	if (error instanceof AppError) {
 		return response.status(error.statusCode).json({
