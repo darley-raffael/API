@@ -1,9 +1,10 @@
 require("express-async-errors");
+require("dotenv");
 
 const AppError = require("./utils/AppError");
 const express = require("express");
 const app = express();
-const PORT = 3333;
+const PORT = process.env.PORT || 3333;
 const routes = require("./routes");
 const uploadConfig = require("./configs/upload");
 const migrationsRun = require("./database/sqlite/migrations");
